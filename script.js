@@ -1,165 +1,69 @@
+// 1. Fitur Interaktif: Menu Hamburger (Mobile Toggle)
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
 
-/* =========================
-   1. HAMBURGER MENU
-========================= */
-
-const menuToggle = document.getElementById("menuToggle");
-const navLinks = document.getElementById("navLinks");
-
-menuToggle.addEventListener("click", function () {
-
-    navLinks.classList.toggle("active");
-
-    if (navLinks.classList.contains("active")) {
-        menuToggle.innerHTML = "✕";
-    } else {
-        menuToggle.innerHTML = "☰";
-    }
-
+hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
 });
 
-// Tutup menu setelah link diklik
-const navItems = document.querySelectorAll(".nav-links a");
-
-navItems.forEach(function (item) {
-
-    item.addEventListener("click", function () {
-
-        navLinks.classList.remove("active");
-        menuToggle.innerHTML = "☰";
-
+// Menutup menu mobile otomatis saat link diklik
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
     });
-
 });
 
+// 2. Fitur Interaktif: Testimonial Carousel (Slider Ulasan)
+const slides = document.querySelectorAll('.testimonial-slide');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let currentSlide = 0;
 
-/* =========================
-   2. TESTIMONIAL SLIDER
-========================= */
-
-const reviews = [
-
-    {
-        text: '"Ayamnya renyah, sambalnya mantap. Harganya juga ramah di kantong!"',
-        name: "Dinda - Pelanggan"
-    },
-
-    {
-        text: '"Suka banget sama sambalnya! Bisa pilih level pedas sesuai selera."',
-        name: "Raka - Pelanggan"
-    },
-
-    {
-        text: '"Porsinya mengenyangkan dan rasanya enak. Bakal pesan lagi!"',
-        name: "Sari - Pelanggan"
-    }
-
-];
-
-let currentReview = 0;
-
-const reviewText = document.getElementById("reviewText");
-const reviewName = document.getElementById("reviewName");
-
-function showReview(index) {
-
-    currentReview = index;
-
-    reviewText.textContent = reviews[currentReview].text;
-    reviewName.textContent = reviews[currentReview].name;
-
+function showSlide(index) {
+    slides.forEach((slide, i) => {
+        slide.classList.remove('active');
+        if (i === index) {
+            slide.classList.add('active');
+        }
+    });
 }
 
-// Tombol berikutnya
-document.getElementById("nextReview").addEventListener("click", function () {
-
-    currentReview++;
-
-    if (currentReview >= reviews.length) {
-        currentReview = 0;
-    }
-
-    showReview(currentReview);
-
+nextBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
 });
 
-// Tombol sebelumnya
-document.getElementById("prevReview").addEventListener("click", function () {
-
-    currentReview--;
-
-    if (currentReview < 0) {
-        currentReview = reviews.length - 1;
-    }
-
-    showReview(currentReview);
-
+prevBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
 });
 
+// Geser otomatis ulasan setiap 5 detik
+setInterval(() => {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+}, 5000);
 
-/* =========================
-   3. VALIDASI FORM KONTAK
-========================= */
+// 3. Fitur Interaktif: Form Validation (Validasi Form Kontak/Pesan)
+const contactForm = document.getElementById('contactForm');
+const formMessage = document.getElementById('formMessage');
 
-const contactForm = document.getElementById("contactForm");
+contactForm.addEventListener('submit', function(e) {
+    e.preventDefault(); // Mencegah reload halaman
 
-const formMessage = document.getElementById("formMessage");
+    const nama = document.getElementById('nama').value.trim();
+    const nohp = document.getElementById('nohp').value.trim();
+    const pertanyaan = document.getElementById('pertanyaan').value.trim();
 
-contactForm.addEventListener("submit", function (event) {
-
-    event.preventDefault();
-
-    const name = document.getElementById("name").value.trim();
-
-    const phone = document.getElementById("phone").value.trim();
-
-    const question = document.getElementById("question").value.trim();
-
-
-    // Validasi kolom kosong
-    if (name === "" || phone === "" || question === "") {
-
-        formMessage.textContent =
-            "Mohon lengkapi semua kolom terlebih dahulu!";
-
-        formMessage.className = "error";
-
-        return;
-
+    if (nama === '' || nohp === '' || pertanyaan === '') {
+        formMessage.style.color = 'red';
+        formMessage.textContent = 'Harap isi semua kolom (Nama, No HP, dan Pertanyaan/Pesanan)!';
+    } else if (isNaN(nohp) || nohp.length < 10) {
+        formMessage.style.color = 'red';
+        formMessage.textContent = 'Nomor HP/WhatsApp harus berupa angka minimal 10 digit.';
+    } else {
+        formMessage.style.color = 'green';
+        formMessage.textContent = `Terima kasih, ${nama}! Pesanan/Pesan Anda berhasil dikirim. Kami akan segera menghubungi Anda via WhatsApp.`;
+        contactForm.reset();
     }
-
-
-    // Validasi nomor HP
-    const phonePattern = /^[0-9+\-\s]{8,16}$/;
-
-    if (!phonePattern.test(phone)) {
-
-        formMessage.textContent =
-            "Nomor HP tidak valid. Periksa kembali nomor Anda!";
-
-        formMessage.className = "error";
-
-        return;
-
-    }
-
-
-    // Pesan berhasil
-    formMessage.textContent =
-        "Terima kasih " + name +
-        "! Pesan Anda berhasil divalidasi.";
-
-    formMessage.className = "success";
-
-    // Mengosongkan form
-    contactForm.reset();
-
 });
-
-
-/* =========================
-   4. TAHUN COPYRIGHT OTOMATIS
-========================= */
-
-document.getElementById("year").textContent =
-    new Date().getFullYear();
